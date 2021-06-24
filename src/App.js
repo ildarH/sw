@@ -4,6 +4,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 
 import { Http } from './api/https';
+import { addToFavorites, removeFromFavorites } from './redux/actions'
 
 import { Navbar, Main, Favorites } from './components';
 
@@ -11,6 +12,10 @@ import { Navbar, Main, Favorites } from './components';
 function App() {
   const [loading, setLoading] = useState(true);
   const [people, setPeople] = useState([]);
+  const dispatch = useDispatch()
+  const selectFavorites = useSelector(state => state.root.favorites)
+
+  console.log('selectFavorites: ', selectFavorites)
 
   useEffect(() => {
     const fetchPeople = async () => {
@@ -33,6 +38,13 @@ function App() {
     setLoading(false);
   }, []);
 
+  const addToFavoritesHandler = (people) => {
+    dispatch(addToFavorites(people))
+  }
+  const removeFromFavoritesHandler = (id) => {
+    dispatch(removeFromFavorites(id))
+  }
+
   
   return (
     <>
@@ -46,10 +58,10 @@ function App() {
           ) : (
             <Switch>
             <Route exact path='/'>
-              <Main people={people} />
+              <Main people={people} addToFavoritesHandler={addToFavoritesHandler} />
             </Route>
             <Route exact path='/favorites'>
-              <Favorites />
+              <Favorites people={selectFavorites} removeFromFavoritesHandler={removeFromFavoritesHandler} />
             </Route>
           </Switch>
           )}
