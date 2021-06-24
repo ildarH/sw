@@ -7,7 +7,7 @@ export const Favorites = ({ people, onDelete }) => {
   return (
     <>
       <Header as='h1'>Favorites</Header>
-      {people ? (
+      {people.length ? (
         <Grid columns={2}>
         {people.map((person, i) => {
           return (

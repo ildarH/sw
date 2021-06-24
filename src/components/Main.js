@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid, Header } from 'semantic-ui-react';
 import { SWCard } from './SWCard';
 
-export const Main = ({ people, addToFavoritesHandler }) => {
+export const Main = ({ people, id, addToFavoritesHandler }) => {
 
   const onClick = (person) => {
     addToFavoritesHandler(person);
@@ -12,9 +12,10 @@ export const Main = ({ people, addToFavoritesHandler }) => {
       <Header as='h1'>People</Header>
       <Grid columns={2}>
         {people.map((person, i) => {
+          const isFavorited = id.includes(person.id)
           return (
             <Grid.Column key={i}>
-              <SWCard person={person} onClick={onClick}/>
+              <SWCard person={person} onClick={onClick} isFavorited={isFavorited} isDisabled={isFavorited}/>
             </Grid.Column>
           );
         })}

@@ -1,51 +1,53 @@
-import React, { useState, useEffect} from 'react';
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 
 import { Http } from './api/https';
-import { addToFavorites, removeFromFavorites } from './redux/actions'
+import { addToFavorites, removeFromFavorites } from './redux/actions';
 
 import { Navbar, Main, Favorites } from './components';
-
 
 function App() {
   const [loading, setLoading] = useState(true);
   const [people, setPeople] = useState([]);
-  const dispatch = useDispatch()
-  const selectFavorites = useSelector(state => state.root.favorites)
+  const dispatch = useDispatch();
+  const selectFavorites = useSelector((state) => state.root.favorites);
+  const selectId = useSelector((state) => state.root.id);
 
-  console.log('selectFavorites: ', selectFavorites)
+  console.log('selectFavorites: ', selectFavorites);
+  console.log('selectId: ', selectId);
 
   useEffect(() => {
-    const fetchPeople = async () => {
-      const apiResponse = await Http.get('people', 'info');
-      console.log(apiResponse);
-      const res = apiResponse.results.map((people, i) => {
-        const characterId = people.url.split('/').slice(-2).join('')
+    const fetchData = async () => {
+      const peopleResponse = await Http.get('people', 'info');
+      // console.log(peopleResponse);
+      const res = peopleResponse.results.map((people, i) => {
+        const characterId = people.url.split('/').slice(-2).join('');
+        const homeworld = people.homeworld.split('/').slice(-3).join('/')
+        // console.log('homeworld: ', homeworld);
         return {
           id: characterId,
           gender: people.gender,
-          homeworld: people.homeworld,
+          homeworld,
           name: people.name,
-          pictureUrl: `https://starwars-visualguide.com/assets/img/characters/${characterId}.jpg`
-        }
-      })
+          pictureUrl: `https://starwars-visualguide.com/assets/img/characters/${characterId}.jpg`,
+        };
+      });
       console.log('filtred response: ', res);
       setPeople(res);
     };
-    fetchPeople();
+    fetchData();
     setLoading(false);
   }, []);
 
-  const addToFavoritesHandler = (people) => {
-    dispatch(addToFavorites(people))
-  }
-  const removeFromFavoritesHandler = (id) => {
-    dispatch(removeFromFavorites(id))
-  }
+  const addToFavoritesHandler = (person) => {
+    dispatch(addToFavorites(person));
+  };
+  const removeFromFavoritesHandler = (person) => {
+    dispatch(removeFromFavorites(person.id));
+  };
 
-  
   return (
     <>
       <BrowserRouter>
@@ -57,15 +59,14 @@ function App() {
             </Dimmer>
           ) : (
             <Switch>
-            <Route exact path='/'>
-              <Main people={people} addToFavoritesHandler={addToFavoritesHandler} />
-            </Route>
-            <Route exact path='/favorites'>
-              <Favorites people={selectFavorites} removeFromFavoritesHandler={removeFromFavoritesHandler} />
-            </Route>
-          </Switch>
+              <Route exact path='/'>
+                <Main people={people} id={selectId} addToFavoritesHandler={addToFavoritesHandler} />
+              </Route>
+              <Route exact path='/favorites'>
+                <Favorites people={selectFavorites} onDelete={removeFromFavoritesHandler} />
+              </Route>
+            </Switch>
           )}
-
         </Container>
       </BrowserRouter>
     </>
