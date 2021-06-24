@@ -27,7 +27,7 @@ function App() {
         <Container>
           <Switch>
             <Route exact path='/'>
-              <Main />
+              <Main people={people} />
             </Route>
             <Route exact path='/favorites'>
               <Favorites />
