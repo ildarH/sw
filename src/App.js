@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+
+import { Http } from './api/http';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [loading, setLoading] = useState(true);
+	const [people, setPeople] = useState([]);
+
+	useEffect(() => {
+		const fetchPeople = async () => {
+			let result = await Http.get('people');
+      console.log(result);
+			setPeople(result.results);
+		};
+    fetchPeople()
+    setLoading(false);
+	}, []);
+
+	return <div className='App'>{loading ? <p>loading...</p> : people}</div>;
 }
 
 export default App;
