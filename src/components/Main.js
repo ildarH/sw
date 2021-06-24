@@ -1,29 +1,20 @@
 import React from 'react';
-import { Button, Card, Grid, Header, Image } from 'semantic-ui-react';
+import { Grid, Header } from 'semantic-ui-react';
+import { SWCard } from './SWCard';
 
 export const Main = ({ people }) => {
+
+  const onClick = (id) => {
+    console.log('fav #', id);
+  }
   return (
     <>
-      <Header as="h1">People</Header>
+      <Header as='h1'>People</Header>
       <Grid columns={2}>
         {people.map((people, i) => {
           return (
             <Grid.Column key={i}>
-              <Card>
-                <Card.Content>
-                  
-                    <Card.Header>
-                    <Header as='h2'>
-                    {people.name}
-                    </Header>
-                    </Card.Header>
-                    <Card.Description>
-                      <Image src={people.pictureUrl} />
-                      <Button icon='heart' />
-                    </Card.Description>
-                  
-                </Card.Content>
-              </Card>
+              <SWCard people={people} onClick={onClick}/>
             </Grid.Column>
           );
         })}

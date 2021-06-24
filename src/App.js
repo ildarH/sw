@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 
@@ -18,6 +19,7 @@ function App() {
       const res = apiResponse.results.map((people, i) => {
         const characterId = people.url.split('/').slice(-2).join('')
         return {
+          id: characterId,
           gender: people.gender,
           homeworld: people.homeworld,
           name: people.name,
