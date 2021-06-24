@@ -14,7 +14,6 @@ export class Http {
 
 async function request(params, method = 'GET') {
     const url = params ? `${swapiUrl}${params}`:`${swapiUrl}`
-    console.log('url request: ', url);
     const config = {
         method,
         headers: Http.HEADERS

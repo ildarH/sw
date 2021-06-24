@@ -7,10 +7,10 @@ export const Navbar = () => {
         <Menu inverted>
             <Container>
                 <Link to='/'>
-                    <Menu.Item name='main' />
+                    <Menu.Item name='Главная' />
                 </Link>
                 <Link to='/favorites'>
-                    <Menu.Item name='favorites' />
+                    <Menu.Item name='любимые герои' />
                 </Link>
             </Container>
         </Menu>
