@@ -1,4 +1,4 @@
-const baseUrl = 'https://swapi.dev/api/'
+const swapiUrl = 'https://swapi.dev/api/'
 
 export class Http {
     static HEADERS = { 'Content-Type': 'application/json' }
@@ -13,7 +13,8 @@ export class Http {
 }
 
 async function request(params, method = 'GET') {
-    const url = params ? `${baseUrl}${params}` : `${baseUrl}`
+    const url = params ? `${swapiUrl}${params}`:`${swapiUrl}`
+    console.log('url request: ', url);
     const config = {
         method,
         headers: Http.HEADERS
