@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Menu, Input, Button } from 'semantic-ui-react';
+import { Menu, Input, Button, Dropdown } from 'semantic-ui-react';
 import { Link, useRouteMatch } from 'react-router-dom';
 
-export const Navbar = ({ onSearch, isResult, clearResult }) => {
+export const Navbar = ({ onSearch, isResult, clearResult, filterHandler, genderVariations }) => {
   const [searchValue, setSearchValue] = useState('');
 
   let favorites = useRouteMatch('/favorites');
@@ -15,14 +15,9 @@ export const Navbar = ({ onSearch, isResult, clearResult }) => {
 
   return (
     <Menu inverted borderless>
-      <Menu.Item active={!isActive}>
-        <Link to='/'>{isResult ? 'Результат' : 'Главная'}</Link>
-      </Menu.Item>
-      <Menu.Item active={isActive}>
-        {isResult ? 'Избранное' : <Link to='/favorites'>Избранное</Link>}
-      </Menu.Item>
-      <Menu.Item>
-        {isResult ? (
+      {isResult ? (
+        <>
+          <Menu.Item>Результат поиска</Menu.Item>
           <Button
             onClick={() => {
               setSearchValue('');
@@ -30,24 +25,47 @@ export const Navbar = ({ onSearch, isResult, clearResult }) => {
             }}>
             Очистить
           </Button>
-        ) : (
-          <Input
-            type='text'
-            value={searchValue}
-            size='small'
-            placeholder='Поиск...'
-            onChange={(e) => setSearchValue(e.target.value)}>
-            <input />
+        </>
+      ) : (
+        <>
+          <Menu.Item active={!isActive}>
+            <Link to='/'>Главная</Link>
+          </Menu.Item>
+          <Menu.Item active={isActive}>
+            <Link to='/favorites'>Избранное</Link>
+          </Menu.Item>
+          <Menu.Item>
+            <Input
+              type='text'
+              value={searchValue}
+              size='small'
+              disabled={isActive}
+              placeholder='Поиск...'
+              onChange={(e) => setSearchValue(e.target.value)}>
+              <input />
 
-            <Button
-              type='submit'
-              disabled={searchValue.length > 0 ? false : true}
-              onClick={(e) => clickHandler(e)}>
-              Поиск
-            </Button>
-          </Input>
-        )}
-      </Menu.Item>
+              <Button
+                type='submit'
+                disabled={searchValue.length > 0 ? false : true}
+                onClick={(e) => clickHandler(e)}>
+                Поиск
+              </Button>
+            </Input>
+          </Menu.Item>
+          
+            <Menu.Item>
+              <Dropdown
+                clearable
+                options={genderVariations}
+                selection
+                compact
+                disabled={isActive}
+                onChange={(e, data) => filterHandler(data.value)}
+              />
+            </Menu.Item>
+          
+        </>
+      )}
     </Menu>
   );
 };

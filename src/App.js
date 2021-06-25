@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { Container, Dimmer, Loader, Pagination } from 'semantic-ui-react';
@@ -14,8 +14,19 @@ import {
 
 import { Navbar, Main, Favorites } from './components';
 
+const filter = (people, gender) => {
+  const filteredPeople = [...people]
+  if(!gender || gender === undefined) {
+    return filteredPeople
+  } else {
+    return filteredPeople.filter(person => person.gender === gender)
+  }
+}
+
 function App() {
   const dispatch = useDispatch();
+  const [filterCondition, setFilterCondition] = useState('')
+  const [filteredPeople, setFilteredPeople] = useState([])
   const currentPage = useSelector((state) => state.root.currentPage);
   const loading = useSelector((state) => state.root.isLoading);
   const selectPeople = useSelector((state) => state.root.people);
@@ -23,10 +34,21 @@ function App() {
   const selectFavorites = useSelector((state) => state.root.favorites);
   const selectId = useSelector((state) => state.root.id);
   const selectTotalPages = useSelector((state) => state.root.totalPage);
+  const genderVariations = [...new Set(selectPeople.map(person => person.gender))].map((el, i) => {
+    return {
+      key: i,
+      text: el,
+      value: el
+    }
+  })
 
   useEffect(() => {
     dispatch(fetchPeopleData(currentPage));
   }, [dispatch, currentPage]);
+
+  useEffect(() => {
+    setFilteredPeople(filter(selectPeople, filterCondition))
+  }, [filterCondition, selectPeople])
 
   const addToFavoritesHandler = (person) => {
     dispatch(addToFavorites(person));
@@ -40,6 +62,9 @@ function App() {
   const clearSearchHandler = () => {
     dispatch(clearResult());
   };
+  const filterHandler = (condition) => {
+    setFilterCondition(condition)
+  }
 
   return (
     <>
@@ -48,6 +73,8 @@ function App() {
           onSearch={searchHandler}
           clearResult={clearSearchHandler}
           isResult={!!selectSearchResponse ? true : false}
+          filterHandler={filterHandler}
+          genderVariations={genderVariations}
         />
         <Container>
           {loading ? (
@@ -58,13 +85,12 @@ function App() {
             <Switch>
               <Route exact path='/'>
                 <Pagination
-                  // defaultActivePage={1}
                   activePage={currentPage}
                   totalPages={selectTotalPages}
                   onPageChange={(e, { activePage }) => dispatch(setCurrentPage(activePage))}
                 />
                 <Main
-                  people={selectSearchResponse ? selectSearchResponse : selectPeople}
+                  people={selectSearchResponse ? selectSearchResponse : filteredPeople}
                   id={selectId}
                   title={selectSearchResponse ? 'Результат поиска' : 'Персонажи'}
                   addToFavoritesHandler={addToFavoritesHandler}

@@ -61,7 +61,6 @@ export const fetchPlanetData = (planet) => async (dispatch) => {
       gravity: planetResponse.gravity,
       terrain: planetResponse.terrain,
     };
-    console.log('fetchPlanetData: ', result);
     dispatch({ type: FETCH_PLANET_DATA, payload: result });
   } catch (error) {
     dispatch({ type: SHOW_PLANET_ERROR, payload: 'Ошибка загрузки' });
