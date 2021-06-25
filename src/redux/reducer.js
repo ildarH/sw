@@ -6,7 +6,11 @@ import {
   SHOW_PLANET_ERROR,
   HIDE_PLANET_ERROR,
   SHOW_PEOPLE_ERROR,
-  HIDE_PEOPLE_ERROR
+  HIDE_PEOPLE_ERROR,
+  SHOW_SEARCH_ERROR,
+  HIDE_SEARCH_ERROR,
+  SET_SEARCH_RESPONSE,
+  CLEAR_SEARCH_RESPONSE
 } from './types';
 
 const initialState = {
@@ -15,7 +19,9 @@ const initialState = {
   favorites: [],
   id: [],
   peopleError: null,
-  planetError: null
+  planetError: null,
+  searchResponse: null,
+  searchError: null
 };
 
 export const rootReducer = (state = initialState, { type, payload }) => {
@@ -75,6 +81,34 @@ export const rootReducer = (state = initialState, { type, payload }) => {
       const newState = {
         ...state,
         planetError: null
+      }
+      return newState
+    }
+    case SET_SEARCH_RESPONSE: {
+      const newState = {
+        ...state,
+        searchResponse: payload
+      }
+      return newState
+    }
+    case CLEAR_SEARCH_RESPONSE: {
+      const newState = {
+        ...state,
+        searchResponse: null
+      }
+      return newState
+    }
+    case SHOW_SEARCH_ERROR: {
+      const newState = {
+        ...state,
+        searchError: payload
+      }
+      return newState
+    }
+    case HIDE_SEARCH_ERROR: {
+      const newState = {
+        ...state,
+        searchError: null
       }
       return newState
     }

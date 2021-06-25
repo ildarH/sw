@@ -12,7 +12,7 @@ export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
   useEffect(() => {
     dispatch(fetchPlanetData(person.homeworld));
     setLoading(false);
-  }, [person, dispatch]);
+  }, [dispatch, person.homeworld]);
 
   return (
     <Card raised>
@@ -21,7 +21,7 @@ export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
           <Placeholder.Image rectangular />
         </Placeholder>
       ) : (
-        <Image src={person.pictureUrl} size='medium' />
+        <Image src={person.pictureUrl} size='medium'/>
       )}
 
       <Card.Content>
@@ -31,9 +31,10 @@ export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
               <Placeholder.Line length='medium' />
             </Placeholder.Header>
             <Placeholder.Paragraph>
+              <Placeholder.Line length='medium' />
               <Placeholder.Line length='long' />
               <Placeholder.Line length='long' />
-              <Placeholder.Line length='long' />
+              <Placeholder.Line length='short' />
             </Placeholder.Paragraph>
           </Placeholder>
         ) : (

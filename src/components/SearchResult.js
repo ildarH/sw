@@ -1,16 +1,15 @@
 import React from 'react';
-import { Grid, Header } from 'semantic-ui-react';
+import { Container, Grid, Header } from 'semantic-ui-react';
 import { SWCard } from './SWCard';
 
-export const Main = ({ people, id, addToFavoritesHandler, title }) => {
+export const SearchResult = ({ people, id, addToFavorites }) => {
   const onClick = (person) => {
-    addToFavoritesHandler(person);
+    addToFavorites(person);
   };
-
   return (
     <>
-      <Header as='h1'>{title}</Header>
-      {people.length > 0 ? (
+      <Header as='h1'>Результат поиска</Header>
+      {people ? (
         <Grid columns={2}>
         {people.map((person, i) => {
           const isFavorited = id.includes(person.id);
@@ -26,10 +25,12 @@ export const Main = ({ people, id, addToFavoritesHandler, title }) => {
           );
         })}
       </Grid>
-      ) : (
-        <p>Никого не найдено</p>
+      ): (
+        <Container>
+          Никого не найдено :(
+        </Container>
       )}
-
+      
     </>
   );
 };

@@ -6,7 +6,7 @@ export const Favorites = ({ people, onDelete }) => {
 
   return (
     <>
-      <Header as='h1'>Favorites</Header>
+      <Header as='h1'>Избранное</Header>
       {people.length ? (
         <Grid columns={2}>
         {people.map((person, i) => {

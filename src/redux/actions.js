@@ -7,25 +7,34 @@ import {
   SHOW_PEOPLE_ERROR,
   HIDE_PEOPLE_ERROR,
   SHOW_PLANET_ERROR,
-  HIDE_PLANET_ERROR
+  HIDE_PLANET_ERROR,
+  SHOW_SEARCH_ERROR,
+  HIDE_SEARCH_ERROR,
+  SET_SEARCH_RESPONSE,
+  CLEAR_SEARCH_RESPONSE
 } from './types';
+
+const mapResponse = (response) => {
+  if (response.length === 0) return null
+  return response.map((people) => {
+    const characterId = people.url.split('/').slice(-2).join('');
+    const homeworld = people.homeworld.split('/').slice(-3).join('/');
+    return {
+      id: characterId,
+      gender: people.gender,
+      homeworld,
+      name: people.name,
+      pictureUrl: `https://starwars-visualguide.com/assets/img/characters/${characterId}.jpg`,
+    };
+  });
+}
 
 export const fetchPeopleData = (page) => async (dispatch) => {
   dispatch({ type: HIDE_PEOPLE_ERROR });
   const url = page ? `people/${page}` : `people/`;
   try {
     const peopleResponse = await Http.get(url);
-    const results = peopleResponse.results.map((people) => {
-      const characterId = people.url.split('/').slice(-2).join('');
-      const homeworld = people.homeworld.split('/').slice(-3).join('/');
-      return {
-        id: characterId,
-        gender: people.gender,
-        homeworld,
-        name: people.name,
-        pictureUrl: `https://starwars-visualguide.com/assets/img/characters/${characterId}.jpg`,
-      };
-    });
+    const results = mapResponse(peopleResponse.results)
     dispatch({ type: FETCH_PEOPLE_DATA, payload: results });
   } catch (error) {
     dispatch({ type: SHOW_PEOPLE_ERROR, payload: 'Ошибка загрузки' });
@@ -47,7 +56,20 @@ export const fetchPlanetData = (planet) => async (dispatch) => {
     dispatch({ type: SHOW_PLANET_ERROR, payload: 'Ошибка загрузки' });
   }
 };
-
+export const searchRequest = (request) => async dispatch => {
+  dispatch({type: HIDE_SEARCH_ERROR})
+  dispatch({type: CLEAR_SEARCH_RESPONSE})
+  console.log('request: ', request);
+  try {
+    const response = await Http.get(`people/?search=${request}`)
+    const result = mapResponse(response.results)
+    console.log('response results: ', result);
+    dispatch ({type: SET_SEARCH_RESPONSE, payload: result})
+  } catch (error) {
+    dispatch({type: SHOW_SEARCH_ERROR, payload: 'Не найдено'})
+  }
+}
+export const clearResult = () => ({type: CLEAR_SEARCH_RESPONSE})
 export const addToFavorites = (people) => async (dispatch) => {
   dispatch({ type: ADD_TO_FAVORITES, payload: people });
 };
