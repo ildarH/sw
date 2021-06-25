@@ -10,6 +10,7 @@ const presistConfig = {
   key: 'root',
   storage,
   stateReconciler: autoMergeLevel2,
+  whitelist: ['favorites']
 };
 
 export const store = createStore(

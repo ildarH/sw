@@ -35,14 +35,12 @@ export const Navbar = ({ onSearch, isResult, clearResult }) => {
             type='text'
             value={searchValue}
             size='small'
-            icon='search'
             placeholder='Поиск...'
             onChange={(e) => setSearchValue(e.target.value)}>
             <input />
 
             <Button
               type='submit'
-              icon='search'
               disabled={searchValue.length > 0 ? false : true}
               onClick={(e) => clickHandler(e)}>
               Поиск

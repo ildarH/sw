@@ -1,4 +1,5 @@
 import { Http } from '../api/https';
+
 import {
   ADD_TO_FAVORITES,
   FETCH_PEOPLE_DATA,
@@ -11,7 +12,11 @@ import {
   SHOW_SEARCH_ERROR,
   HIDE_SEARCH_ERROR,
   SET_SEARCH_RESPONSE,
-  CLEAR_SEARCH_RESPONSE
+  CLEAR_SEARCH_RESPONSE,
+  SET_CURRENT_PAGE,
+  SET_TOTAL_PAGE,
+  SHOW_LOADER,
+  HIDE_LOADER
 } from './types';
 
 const mapResponse = (response) => {
@@ -31,13 +36,18 @@ const mapResponse = (response) => {
 
 export const fetchPeopleData = (page) => async (dispatch) => {
   dispatch({ type: HIDE_PEOPLE_ERROR });
-  const url = page ? `people/${page}` : `people/`;
+  dispatch({ type: SHOW_LOADER})
+  const url = page ? `people/?page=${page}` : `people/`;
   try {
     const peopleResponse = await Http.get(url);
     const results = mapResponse(peopleResponse.results)
+    const totalPage = Math.ceil(peopleResponse.count / 10)
+    dispatch({ type: SET_TOTAL_PAGE, payload: totalPage })
     dispatch({ type: FETCH_PEOPLE_DATA, payload: results });
   } catch (error) {
     dispatch({ type: SHOW_PEOPLE_ERROR, payload: 'Ошибка загрузки' });
+  } finally {
+    dispatch({ type: HIDE_LOADER })
   }
 };
 export const fetchPlanetData = (planet) => async (dispatch) => {
@@ -51,6 +61,7 @@ export const fetchPlanetData = (planet) => async (dispatch) => {
       gravity: planetResponse.gravity,
       terrain: planetResponse.terrain,
     };
+    console.log('fetchPlanetData: ', result);
     dispatch({ type: FETCH_PLANET_DATA, payload: result });
   } catch (error) {
     dispatch({ type: SHOW_PLANET_ERROR, payload: 'Ошибка загрузки' });
@@ -59,16 +70,15 @@ export const fetchPlanetData = (planet) => async (dispatch) => {
 export const searchRequest = (request) => async dispatch => {
   dispatch({type: HIDE_SEARCH_ERROR})
   dispatch({type: CLEAR_SEARCH_RESPONSE})
-  console.log('request: ', request);
   try {
     const response = await Http.get(`people/?search=${request}`)
     const result = mapResponse(response.results)
-    console.log('response results: ', result);
     dispatch ({type: SET_SEARCH_RESPONSE, payload: result})
   } catch (error) {
     dispatch({type: SHOW_SEARCH_ERROR, payload: 'Не найдено'})
   }
 }
+export const setCurrentPage = (page) => ({type: SET_CURRENT_PAGE, payload: page })
 export const clearResult = () => ({type: CLEAR_SEARCH_RESPONSE})
 export const addToFavorites = (people) => async (dispatch) => {
   dispatch({ type: ADD_TO_FAVORITES, payload: people });

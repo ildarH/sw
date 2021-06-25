@@ -10,10 +10,15 @@ import {
   SHOW_SEARCH_ERROR,
   HIDE_SEARCH_ERROR,
   SET_SEARCH_RESPONSE,
-  CLEAR_SEARCH_RESPONSE
+  CLEAR_SEARCH_RESPONSE,
+  SET_CURRENT_PAGE,
+  SET_TOTAL_PAGE,
+  SHOW_LOADER,
+  HIDE_LOADER
 } from './types';
 
 const initialState = {
+  isLoading: true,
   people: [],
   planet: [],
   favorites: [],
@@ -21,11 +26,27 @@ const initialState = {
   peopleError: null,
   planetError: null,
   searchResponse: null,
-  searchError: null
+  searchError: null,
+  currentPage: 1,
+  totalPage: 0
 };
 
 export const rootReducer = (state = initialState, { type, payload }) => {
   switch (type) {
+    case SHOW_LOADER: {
+      const newState ={
+        ...state,
+        isLoading: true
+      }
+      return newState
+    }
+    case HIDE_LOADER: {
+      const newState = {
+        ...state,
+        isLoading: false
+      }
+      return newState
+    }
     case FETCH_PEOPLE_DATA: {
       const newState = {
         ...state,
@@ -109,6 +130,20 @@ export const rootReducer = (state = initialState, { type, payload }) => {
       const newState = {
         ...state,
         searchError: null
+      }
+      return newState
+    }
+    case SET_TOTAL_PAGE: {
+      const newState = {
+        ...state,
+        totalPage: payload
+      }
+      return newState
+    }
+    case SET_CURRENT_PAGE: {
+      const newState = {
+        ...state,
+        currentPage: payload
       }
       return newState
     }

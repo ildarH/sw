@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { Container, Dimmer, Loader } from 'semantic-ui-react';
+import { Container, Dimmer, Loader, Pagination } from 'semantic-ui-react';
 
 import {
   fetchPeopleData,
@@ -9,22 +9,24 @@ import {
   removeFromFavorites,
   searchRequest,
   clearResult,
+  setCurrentPage,
 } from './redux/actions';
 
 import { Navbar, Main, Favorites } from './components';
 
 function App() {
-  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const currentPage = useSelector((state) => state.root.currentPage);
+  const loading = useSelector((state) => state.root.isLoading);
   const selectPeople = useSelector((state) => state.root.people);
   const selectSearchResponse = useSelector((state) => state.root.searchResponse);
   const selectFavorites = useSelector((state) => state.root.favorites);
   const selectId = useSelector((state) => state.root.id);
+  const selectTotalPages = useSelector((state) => state.root.totalPage);
 
   useEffect(() => {
-    dispatch(fetchPeopleData());
-    setLoading(false);
-  }, [dispatch]);
+    dispatch(fetchPeopleData(currentPage));
+  }, [dispatch, currentPage]);
 
   const addToFavoritesHandler = (person) => {
     dispatch(addToFavorites(person));
@@ -42,8 +44,8 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Navbar onSearch={searchHandler} 
-
+        <Navbar
+          onSearch={searchHandler}
           clearResult={clearSearchHandler}
           isResult={!!selectSearchResponse ? true : false}
         />
@@ -55,12 +57,17 @@ function App() {
           ) : (
             <Switch>
               <Route exact path='/'>
+                <Pagination
+                  // defaultActivePage={1}
+                  activePage={currentPage}
+                  totalPages={selectTotalPages}
+                  onPageChange={(e, { activePage }) => dispatch(setCurrentPage(activePage))}
+                />
                 <Main
                   people={selectSearchResponse ? selectSearchResponse : selectPeople}
                   id={selectId}
                   title={selectSearchResponse ? 'Результат поиска' : 'Персонажи'}
                   addToFavoritesHandler={addToFavoritesHandler}
-
                 />
               </Route>
               <Route exact path='/favorites'>
