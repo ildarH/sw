@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Accordion, Button, Card, Header, Icon, Image, Placeholder } from 'semantic-ui-react';
 
 import { fetchPlanetData } from './../redux/actions';
 
 export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
-  const [isInfoLoading, setIsInfoLoading] = useState(true);
+
+  const [loading, setLoading] = useState(true)
   const [activeIndex, setActiveIndex] = useState(-1);
   const dispatch = useDispatch();
-  const selectPlanet = useSelector((state) => state.root.planet);
+
+  useEffect(() => {
+    const {planet} = person
+    if(planet?.name || null) {
+      setLoading(false)
+    }
+  },[person])
 
   const handleClick = (e, titleProps) => {
+    const {planet} = person
     const { index } = titleProps;
     const newIndex = activeIndex === index ? -1 : index;
     setActiveIndex(newIndex);
-    dispatch(fetchPlanetData(person.homeworld));
-    setIsInfoLoading(false);
+    
+    if(Object.keys(planet).length === 0 && planet.constructor === Object) {
+      dispatch(fetchPlanetData(person.planetUrl));
+    }
+    
   };
 
   return (
@@ -33,7 +44,7 @@ export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
               Подробнее
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0}>
-              {isInfoLoading ? (
+              {loading ? (
                 <Placeholder>
                   <Placeholder.Paragraph>
                     <Placeholder.Line length='medium' />
@@ -43,9 +54,9 @@ export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
                 </Placeholder>
               ) : (
                 <p>
-                  {person.name} was born on {selectPlanet.name} which population is{' '}
-                  {selectPlanet.population} and climate is {selectPlanet.climate}. Gravity is{' '}
-                  {selectPlanet.gravity}. Terrain is {selectPlanet.terrain}.
+                  {person.name} was born on {person.planet.name} which population is{' '}
+                  {person.planet.population} and climate is {person.planet.climate}. Gravity is{' '}
+                  {person.planet.gravity}. Terrain is {person.planet.terrain}.
                 </p>
               )}
             </Accordion.Content>

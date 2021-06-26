@@ -27,7 +27,8 @@ const mapResponse = (response) => {
     return {
       id: characterId,
       gender: people.gender,
-      homeworld,
+      planetUrl: homeworld,
+      planet: {},
       name: people.name,
       pictureUrl: `https://starwars-visualguide.com/assets/img/characters/${characterId}.jpg`,
     };
@@ -50,10 +51,10 @@ export const fetchPeopleData = (page) => async (dispatch) => {
     dispatch({ type: HIDE_LOADER })
   }
 };
-export const fetchPlanetData = (planet) => async (dispatch) => {
+export const fetchPlanetData = (planetUrl) => async (dispatch) => {
   dispatch({ type: HIDE_PLANET_ERROR });
   try {
-    const planetResponse = await Http.get(planet);
+    const planetResponse = await Http.get(planetUrl);
     const result = {
       name: planetResponse.name,
       population: planetResponse.population,
@@ -61,7 +62,7 @@ export const fetchPlanetData = (planet) => async (dispatch) => {
       gravity: planetResponse.gravity,
       terrain: planetResponse.terrain,
     };
-    dispatch({ type: FETCH_PLANET_DATA, payload: result });
+    dispatch({ type: FETCH_PLANET_DATA, payload: {result, planetUrl}});
   } catch (error) {
     dispatch({ type: SHOW_PLANET_ERROR, payload: 'Ошибка загрузки' });
   }
