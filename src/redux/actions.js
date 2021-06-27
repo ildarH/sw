@@ -15,12 +15,14 @@ import {
   CLEAR_SEARCH_RESPONSE,
   SET_CURRENT_PAGE,
   SET_TOTAL_PAGE,
-  SHOW_LOADER,
-  HIDE_LOADER
+  HIDE_PEOPLE_LOADER,
+  HIDE_PLANET_LOADER,
+  SHOW_PEOPLE_LOADER,
+  SHOW_PLANET_LOADER,
 } from './types';
 
 const mapResponse = (response) => {
-  if (response.length === 0) return null
+  if (response.length === 0) return null;
   return response.map((people) => {
     const characterId = people.url.split('/').slice(-2).join('');
     const homeworld = people.homeworld.split('/').slice(-3).join('/');
@@ -28,31 +30,31 @@ const mapResponse = (response) => {
       id: characterId,
       gender: people.gender,
       planetUrl: homeworld,
-      planet: {},
       name: people.name,
       pictureUrl: `https://starwars-visualguide.com/assets/img/characters/${characterId}.jpg`,
     };
   });
-}
+};
 
 export const fetchPeopleData = (page) => async (dispatch) => {
   dispatch({ type: HIDE_PEOPLE_ERROR });
-  dispatch({ type: SHOW_LOADER})
+  dispatch({ type: SHOW_PEOPLE_LOADER });
   const url = page ? `people/?page=${page}` : `people/`;
   try {
     const peopleResponse = await Http.get(url);
-    const results = mapResponse(peopleResponse.results)
-    const totalPage = Math.ceil(peopleResponse.count / 10)
-    dispatch({ type: SET_TOTAL_PAGE, payload: totalPage })
+    const results = mapResponse(peopleResponse.results);
+    const totalPage = Math.ceil(peopleResponse.count / 10);
+    dispatch({ type: SET_TOTAL_PAGE, payload: totalPage });
     dispatch({ type: FETCH_PEOPLE_DATA, payload: results });
   } catch (error) {
     dispatch({ type: SHOW_PEOPLE_ERROR, payload: 'Ошибка загрузки' });
   } finally {
-    dispatch({ type: HIDE_LOADER })
+    dispatch({ type: HIDE_PEOPLE_LOADER });
   }
 };
 export const fetchPlanetData = (planetUrl) => async (dispatch) => {
   dispatch({ type: HIDE_PLANET_ERROR });
+  dispatch({ type: SHOW_PLANET_LOADER });
   try {
     const planetResponse = await Http.get(planetUrl);
     const result = {
@@ -61,25 +63,38 @@ export const fetchPlanetData = (planetUrl) => async (dispatch) => {
       climate: planetResponse.climate,
       gravity: planetResponse.gravity,
       terrain: planetResponse.terrain,
+      planetUrl: planetResponse.url.split('/').slice(-3).join('/'),
     };
-    dispatch({ type: FETCH_PLANET_DATA, payload: {result, planetUrl}});
+    dispatch({ type: FETCH_PLANET_DATA, payload: result });
   } catch (error) {
     dispatch({ type: SHOW_PLANET_ERROR, payload: 'Ошибка загрузки' });
+  } finally {
+    dispatch({ type: HIDE_PLANET_LOADER });
   }
 };
-export const searchRequest = (request) => async dispatch => {
-  dispatch({type: HIDE_SEARCH_ERROR})
-  dispatch({type: CLEAR_SEARCH_RESPONSE})
+export const searchRequest = (request) => async (dispatch) => {
+  dispatch({ type: HIDE_SEARCH_ERROR });
+  dispatch({ type: CLEAR_SEARCH_RESPONSE });
+  dispatch({ type: SHOW_PEOPLE_LOADER });
   try {
-    const response = await Http.get(`people/?search=${request}`)
-    const result = mapResponse(response.results)
-    dispatch ({type: SET_SEARCH_RESPONSE, payload: result})
+    const response = await Http.get(`people/?search=${request}`);
+    const result = mapResponse(response.results);
+    if (!result) {
+      dispatch({ type: SHOW_SEARCH_ERROR, payload: 'Не найдено' });
+    } else {
+      dispatch({ type: SET_SEARCH_RESPONSE, payload: result });
+    }
   } catch (error) {
-    dispatch({type: SHOW_SEARCH_ERROR, payload: 'Не найдено'})
+    dispatch({ type: SHOW_SEARCH_ERROR, payload: 'Не найдено' });
+  } finally {
+    dispatch({ type: HIDE_PEOPLE_LOADER });
   }
-}
-export const setCurrentPage = (page) => ({type: SET_CURRENT_PAGE, payload: page })
-export const clearResult = () => ({type: CLEAR_SEARCH_RESPONSE})
+};
+export const setCurrentPage = (page) => ({ type: SET_CURRENT_PAGE, payload: page });
+export const clearResult = () => (dispatch) => {
+  dispatch({ type: CLEAR_SEARCH_RESPONSE });
+  dispatch({ type: HIDE_SEARCH_ERROR });
+};
 export const addToFavorites = (people) => async (dispatch) => {
   dispatch({ type: ADD_TO_FAVORITES, payload: people });
 };

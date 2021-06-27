@@ -2,9 +2,6 @@ import {
   ADD_TO_FAVORITES,
   REMOVE_FROM_FAVORITES,
   FETCH_PEOPLE_DATA,
-  FETCH_PLANET_DATA,
-  SHOW_PLANET_ERROR,
-  HIDE_PLANET_ERROR,
   SHOW_PEOPLE_ERROR,
   HIDE_PEOPLE_ERROR,
   SHOW_SEARCH_ERROR,
@@ -13,36 +10,35 @@ import {
   CLEAR_SEARCH_RESPONSE,
   SET_CURRENT_PAGE,
   SET_TOTAL_PAGE,
-  SHOW_LOADER,
-  HIDE_LOADER,
+  SHOW_PEOPLE_LOADER,
+  HIDE_PEOPLE_LOADER,
 } from './types';
 
 const initialState = {
-  isLoading: true,
+  isPeopleLoading: true,
   people: [],
   favorites: [],
   id: [],
   peopleError: null,
-  planetError: null,
   searchError: null,
   searchResponse: null,
   currentPage: 1,
   totalPage: 0,
 };
 
-export const rootReducer = (state = initialState, { type, payload }) => {
+export const peopleReducer = (state = initialState, { type, payload }) => {
   switch (type) {
-    case SHOW_LOADER: {
+    case SHOW_PEOPLE_LOADER: {
       const newState = {
         ...state,
-        isLoading: true,
+        isPeopleLoading: true,
       };
       return newState;
     }
-    case HIDE_LOADER: {
+    case HIDE_PEOPLE_LOADER: {
       const newState = {
         ...state,
-        isLoading: false,
+        isPeopleLoading: false,
       };
       return newState;
     }
@@ -50,24 +46,6 @@ export const rootReducer = (state = initialState, { type, payload }) => {
       const newState = {
         ...state,
         people: payload,
-      };
-      return newState;
-    }
-    case FETCH_PLANET_DATA: {
-      const newState = {
-        ...state,
-        people: [
-          ...state.people.map((person) => {
-            if (person.planetUrl === payload.planetUrl) {
-              return {
-                ...person,
-                planet: payload.result,
-              };
-            } else {
-              return person;
-            }
-          }),
-        ],
       };
       return newState;
     }
@@ -98,20 +76,6 @@ export const rootReducer = (state = initialState, { type, payload }) => {
       const newState = {
         ...state,
         peopleError: null,
-      };
-      return newState;
-    }
-    case SHOW_PLANET_ERROR: {
-      const newState = {
-        ...state,
-        planetError: payload,
-      };
-      return newState;
-    }
-    case HIDE_PLANET_ERROR: {
-      const newState = {
-        ...state,
-        planetError: null,
       };
       return newState;
     }

@@ -10,45 +10,49 @@ import {
   searchRequest,
   clearResult,
   setCurrentPage,
+  fetchPlanetData,
 } from './redux/actions';
 
 import { Navbar, Main, Favorites } from './components';
 
 const filter = (people, gender) => {
-  const filteredPeople = [...people]
-  if(!gender || gender === undefined) {
-    return filteredPeople
+  const filteredPeople = [...people];
+  if (!gender || gender === undefined) {
+    return filteredPeople;
   } else {
-    return filteredPeople.filter(person => person.gender === gender)
+    return filteredPeople.filter((person) => person.gender === gender);
   }
-}
+};
 
 function App() {
   const dispatch = useDispatch();
-  const [filterCondition, setFilterCondition] = useState('')
-  const [filteredPeople, setFilteredPeople] = useState([])
-  const currentPage = useSelector((state) => state.root.currentPage);
-  const loading = useSelector((state) => state.root.isLoading);
-  const selectPeople = useSelector((state) => state.root.people);
-  const selectSearchResponse = useSelector((state) => state.root.searchResponse);
-  const selectFavorites = useSelector((state) => state.root.favorites);
-  const selectId = useSelector((state) => state.root.id);
-  const selectTotalPages = useSelector((state) => state.root.totalPage);
-  const genderVariations = [...new Set(selectPeople.map(person => person.gender))].map((el, i) => {
-    return {
-      key: i,
-      text: el,
-      value: el
-    }
-  })
+  const [filterCondition, setFilterCondition] = useState('');
+  const [filteredPeople, setFilteredPeople] = useState([]);
+  const isLoading = useSelector((state) => state.people.isPeopleLoading);
+  const currentPage = useSelector((state) => state.people.currentPage);
+  const selectPeople = useSelector((state) => state.people.people);
+  const selectSearchResponse = useSelector((state) => state.people.searchResponse);
+  const selectSearchError = useSelector((state) => state.people.searchError)
+  const selectFavorites = useSelector((state) => state.people.favorites);
+  const selectId = useSelector((state) => state.people.id);
+  const selectTotalPages = useSelector((state) => state.people.totalPage);
+  const genderVariations = [...new Set(selectPeople.map((person) => person.gender))].map(
+    (el, i) => {
+      return {
+        key: i,
+        text: el,
+        value: el,
+      };
+    },
+  );
 
   useEffect(() => {
     dispatch(fetchPeopleData(currentPage));
   }, [dispatch, currentPage]);
 
   useEffect(() => {
-    setFilteredPeople(filter(selectPeople, filterCondition))
-  }, [filterCondition, selectPeople])
+    setFilteredPeople(filter(selectPeople, filterCondition));
+  }, [filterCondition, selectPeople]);
 
   const addToFavoritesHandler = (person) => {
     dispatch(addToFavorites(person));
@@ -63,8 +67,12 @@ function App() {
     dispatch(clearResult());
   };
   const filterHandler = (condition) => {
-    setFilterCondition(condition)
-  }
+    setFilterCondition(condition);
+  };
+
+  const planetLoadingHandler = (planetUrl) => {
+    dispatch(fetchPlanetData(planetUrl));
+  };
 
   return (
     <>
@@ -75,9 +83,10 @@ function App() {
           isResult={!!selectSearchResponse ? true : false}
           filterHandler={filterHandler}
           genderVariations={genderVariations}
+          searchError={selectSearchError}
         />
         <Container>
-          {loading ? (
+          {isLoading ? (
             <Dimmer active inverted>
               <Loader inverted>Loading...</Loader>
             </Dimmer>
@@ -92,12 +101,19 @@ function App() {
                 <Main
                   people={selectSearchResponse ? selectSearchResponse : filteredPeople}
                   id={selectId}
+                  searchError={selectSearchError}
                   title={selectSearchResponse ? 'Результат поиска' : 'Персонажи'}
                   addToFavoritesHandler={addToFavoritesHandler}
+                  planetLoadingHandler={planetLoadingHandler}
                 />
               </Route>
               <Route exact path='/favorites'>
-                <Favorites people={selectFavorites} onDelete={removeFromFavoritesHandler} />
+                <Favorites
+                  people={selectFavorites}
+                  // planets={selectPlanets}
+                  onDelete={removeFromFavoritesHandler}
+                  planetLoadingHandler={planetLoadingHandler}
+                />
               </Route>
             </Switch>
           )}

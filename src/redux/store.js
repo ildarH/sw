@@ -4,17 +4,24 @@ import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 import thunk from 'redux-thunk';
 
-import { rootReducer } from './reducer';
+import { peopleReducer } from './peopleReducer';
+import { planetReducer } from './planetReducer';
 
-const presistConfig = {
-  key: 'root',
+const persistPeopleConfig = {
+  key: 'people',
   storage,
   stateReconciler: autoMergeLevel2,
-  whitelist: ['favorites']
+  whitelist: ['favorites'],
 };
-
-export const store = createStore(
-  combineReducers({ root: persistReducer(presistConfig, rootReducer) }),
-  applyMiddleware(thunk),
-);
+const persistPlanetConfig = {
+  key: 'planet',
+  storage,
+  stateReconciler: autoMergeLevel2,
+  whitelist: ['planet'],
+};
+const root = combineReducers({
+  people: persistReducer(persistPeopleConfig, peopleReducer),
+  planet: persistReducer(persistPlanetConfig, planetReducer),
+});
+export const store = createStore(root, applyMiddleware(thunk));
 export const persistor = persistStore(store);

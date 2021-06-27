@@ -1,32 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Accordion, Button, Card, Header, Icon, Image, Placeholder } from 'semantic-ui-react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { fetchPlanetData } from './../redux/actions';
+import {
+  Accordion,
+  Button,
+  Card,
+  Header,
+  Icon,
+  Image,
+  Message,
+  Placeholder,
+  Divider,
+} from 'semantic-ui-react';
 
-export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
-
-  const [loading, setLoading] = useState(true)
+export const SWCard = ({ person, onClick, isFavorited, isDisabled, planetLoadingHandler }) => {
+  const isPlanetLoading = useSelector((state) => state.planet.isPlanetLoading);
+  const planetError = useSelector((state) => state.planet.planetError);
+  const filterPlanet =
+    useSelector((state) =>
+      state.planet.planet.find((planet) => planet.planetUrl === person.planetUrl),
+    ) || null;
   const [activeIndex, setActiveIndex] = useState(-1);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const {planet} = person
-    if(planet?.name || null) {
-      setLoading(false)
-    }
-  },[person])
 
   const handleClick = (e, titleProps) => {
-    const {planet} = person
     const { index } = titleProps;
     const newIndex = activeIndex === index ? -1 : index;
     setActiveIndex(newIndex);
-    
-    if(Object.keys(planet).length === 0 && planet.constructor === Object) {
-      dispatch(fetchPlanetData(person.planetUrl));
+    if (!filterPlanet) {
+      planetLoadingHandler(person.planetUrl);
     }
-    
   };
 
   return (
@@ -44,20 +46,35 @@ export const SWCard = ({ person, onClick, isFavorited, isDisabled }) => {
               Подробнее
             </Accordion.Title>
             <Accordion.Content active={activeIndex === 0}>
-              {loading ? (
+              {isPlanetLoading ? (
                 <Placeholder>
                   <Placeholder.Paragraph>
-                    <Placeholder.Line length='medium' />
+                    <Placeholder.Line length='full' />
+                    <Placeholder.Line length='full' />
+                    <Placeholder.Line length='full' />
                     <Placeholder.Line length='long' />
-                    <Placeholder.Line length='short' />
                   </Placeholder.Paragraph>
                 </Placeholder>
+              ) : planetError ? (
+                <>
+                  <Message negative compact>
+                    <Message.Content>
+                      <p>{planetError}</p>
+                      <Divider />
+                      <Button compact icon onClick={() => planetLoadingHandler(person.planetUrl)}>
+                        <Icon name='redo' />
+                      </Button>
+                    </Message.Content>
+                  </Message>
+                </>
               ) : (
-                <p>
-                  {person.name} was born on {person.planet.name} which population is{' '}
-                  {person.planet.population} and climate is {person.planet.climate}. Gravity is{' '}
-                  {person.planet.gravity}. Terrain is {person.planet.terrain}.
-                </p>
+                filterPlanet && (
+                  <p>
+                    {person.name} was born on {filterPlanet.name} which population is{' '}
+                    {filterPlanet.population} and climate is {filterPlanet.climate}. Gravity is{' '}
+                    {filterPlanet.gravity}. Terrain is {filterPlanet.terrain}.
+                  </p>
+                )
               )}
             </Accordion.Content>
           </Accordion>
